@@ -1,7 +1,6 @@
 import subprocess
 import webbrowser
 import time
-import os
 
 print("Starting FastAPI backend...")
 backend_process = subprocess.Popen(
@@ -13,8 +12,7 @@ backend_process = subprocess.Popen(
 # === Step 2: Wait a few seconds for backend to spin up ===
 time.sleep(3)
 
-# === Step 3: Open homepage.html in default browser ===
-html_path = os.path.abspath("homepage.html")
-webbrowser.open(f"file://{html_path}")
+# === Step 3: Open homepage in default browser through FastAPI server ===
+webbrowser.open("http://127.0.0.1:8000")
 
 print("🚀 UA Nav Access launched.")

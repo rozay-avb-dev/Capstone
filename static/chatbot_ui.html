@@ -209,7 +209,9 @@
 
     if (data.nearby && data.nearby.length > 0) {
       const buildingList = data.nearby.map(b => `• ${b.name}`).join('<br>');
-      addMessage("bot", `<b>Nearby Buildings:</b><br>${buildingList}<br>Where would you like to go? Type the name below.`);
+      addMessage("bot", `<b>Nearby Buildings:</b><br>${buildingList}<br><br>
+                  <div style="margin-top: 1rem;">Where would you like to go? Type the name below.</div>`
+                );
       awaitingNearbyConsent = false;
       awaitingDirection = true;
     }

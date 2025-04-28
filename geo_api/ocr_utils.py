@@ -1,10 +1,13 @@
 import cv2
 import pytesseract
+import platform
 from PIL import Image
 import os
 import re
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"  # adjust if needed
+
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 
 def preprocess_image_for_ocr(image_path):
     image = cv2.imread(image_path)

@@ -1,10 +1,24 @@
+# Core Web Framework
+fastapi
+uvicorn
+
+# OCR and Image Processing
 pytesseract
 Pillow
+opencv-python
+
+# AI and LLM Integrations
 langchain-openai
 langchain-core
-uvicorn
+
+# Environment Management
 python-dotenv
-geopy 
+python-multipart
+
+# Geolocation and Maps
+geopy
 overpy
-streamlit
 playwright
+
+streamlit
+

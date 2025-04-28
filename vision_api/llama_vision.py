@@ -1,6 +1,9 @@
 import base64
 import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # Make sure env vars are loaded
 
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as f:

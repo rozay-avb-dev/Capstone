@@ -13,3 +13,6 @@ Then, Double click frontend homepage.html file.
 //To run backend and frontend in one go
 
 python launch_app.py
+
+//docker image
+docker compose up --build [http://localhost:8000/]

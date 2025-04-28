@@ -5,8 +5,7 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - OPENAI_API_KEY=your_openai_key
-      - LLM_BASE=https://your-llm-api-base
+    env_file:
+      - .env
     volumes:
       - .:/app

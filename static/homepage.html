@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UA Nav Access | Home</title>
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="/static/manifest.json" />
   <link rel="icon" type="image/png" href="icons/icon1.png" />
   <meta name="theme-color" content="#a6192e" />
 
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
+      navigator.serviceWorker.register('/static/service-worker.js')
         .then(reg => console.log('Service worker registered!', reg))
         .catch(err => console.error('Service worker NOT registered', err));
     });
@@ -149,7 +149,7 @@
   <div class="chat-modal" id="chatModal">
     <span class="chat-close" onclick="toggleChat()">×</span>
     <span class="chat-expand" onclick="toggleFullscreen()">⛶ Fullscreen</span>
-    <iframe src="chatbot_ui.html"></iframe>
+    <iframe src="/static/chatbot_ui.html"></iframe>
   </div>
 
   <div class="chat-fab" onclick="toggleChat()" title="Open Chatbot">

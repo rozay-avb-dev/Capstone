@@ -1,12 +1,13 @@
 from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
 import shutil
 import json
 import re
 import difflib
+from pathlib import Path
 
 from dotenv import load_dotenv
 from vision_api.llama_vision import query_vision_llm
@@ -15,9 +16,21 @@ from geo_api.osm_helper import geocode_address, get_nearby_places
 from geo_api.route_api import get_osm_route
 from geo_api.accessibility_helper import get_accessibility_info
 
+# Load environment variables
 load_dotenv()
 
+# Initialize FastAPI app
 app = FastAPI()
+
+# Serve static frontend files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Serve homepage at root "/"
+@app.get("/", response_class=FileResponse)
+async def root():
+    return FileResponse("static/homepage.html")
+
+# Allow CORS (allow all origins for now - modify later for production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,9 +38,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# NEW: Serve Static Files
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
+# Session state to track user's interaction
 session_state = {
     "image_path": "",
     "address": "",
@@ -37,6 +48,7 @@ session_state = {
     "nearby": []
 }
 
+# Endpoint: Upload an image
 @app.post("/upload")
 async def upload(file: UploadFile = File(...)):
     os.makedirs("data", exist_ok=True)
@@ -58,6 +70,7 @@ async def upload(file: UploadFile = File(...)):
         session_state["building_number"] = building_number.strip()
 
     if not building_name or len(building_name) < 5 or not any(c.isalpha() for c in building_name):
+        # Fallback to LLM if building name is unclear
         fallback_prompt = """
         You are a helpful assistant. From this map screenshot popup, extract:
         - Building Name
@@ -102,10 +115,12 @@ async def upload(file: UploadFile = File(...)):
         "nearby": nearby
     }
 
+# Endpoint: Get nearby buildings
 @app.get("/nearby")
 async def get_nearby():
     return {"nearby": session_state["nearby"]}
 
+# Endpoint: Get directions between buildings
 @app.post("/directions")
 async def directions(request: Request):
     body = await request.json()
@@ -118,7 +133,10 @@ async def directions(request: Request):
         default=None
     )
     if not matched:
-        return {"directions": [], "llm_response": f"Could not find {building_name} in nearby buildings."}
+        return {
+            "directions": [],
+            "llm_response": f"Could not find {building_name} in nearby buildings."
+        }
 
     directions = get_osm_route(session_state["location"], {"lat": matched["lat"], "lon": matched["lon"]})
     directions = [step for step in directions if not step.startswith("[")]
@@ -136,6 +154,7 @@ async def directions(request: Request):
             "accessibility": accessibility_info
         }
     else:
+        # If no directions available, fallback to LLM-based navigation
         prompt = f"""
         You are a helpful assistant.
         The user is currently at: {session_state['building_name']} (Building {session_state['building_number']}), {session_state['address']}.
@@ -151,6 +170,7 @@ async def directions(request: Request):
 
         lines = llm_response.strip().splitlines()
         trimmed = "\n".join([line for line in lines if line.strip()])
+
         return {
             "directions": [],
             "llm_response": trimmed,
